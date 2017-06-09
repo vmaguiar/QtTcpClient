@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             SLOT(tcpDisconnect()));
 
-
     connect(ui->StartButton,
             SIGNAL (clicked(bool)),
             this,
@@ -31,10 +30,15 @@ MainWindow::MainWindow(QWidget *parent) :
             this,
             SLOT (stopTime()));
 
-    connect(t,
+    connect(O_Mago_do_Tempo,
             SIGNAL(timeout()),
             this,
             SLOT(putData()));
+
+    connect(ui->HS_Timing,
+            SIGNAL(valueChanged(int)),
+            this,
+            SLOT(startTime()));
 }
 
 void MainWindow::tcpConnect(){
@@ -50,7 +54,7 @@ void MainWindow::tcpDisconnect()
 {
     socket->disconnectFromHost();
     qDebug() << "Disconnected";
-    t->stop();
+    O_Mago_do_Tempo->stop();
 }
 
 void MainWindow::putData()
@@ -84,17 +88,18 @@ void MainWindow::putData()
 
 void MainWindow::startTime()
 {
-    t->start(ui->HS_Timing->value()*1000);
+    O_Mago_do_Tempo->start(ui->HS_Timing->value()*1000);
 
 }
 
 void MainWindow::stopTime()
 {
-    t->stop();
+    O_Mago_do_Tempo->stop();
 }
 
 MainWindow::~MainWindow()
 {
     delete socket;
     delete ui;
+    delete O_Mago_do_Tempo;
 }
