@@ -1,5 +1,5 @@
 #include "plotter.h"
-#include "ui_plotter.h"
+//#include "ui_plotter.h"
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -7,10 +7,10 @@
 #include <QDebug>
 
 Plotter::Plotter(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Plotter)
+    QWidget(parent)
+   // ui(new Ui::Plotter)
 {
-    ui->setupUi(this);
+    //ui->setupUi(this);
     teta = 0.0;
     startTimer(10);
     veloc = 0.0;
