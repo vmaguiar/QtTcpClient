@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDateTime>
+#include <QDebug>
 #include <QColorDialog>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -85,7 +87,12 @@ void MainWindow::tcpDisconnect()
     O_bruxo_do_tempo->stop();
 }
 
-void MainWindow::getData(){
+void MainWindow::getData()
+{
+  double menorx, maiorx, menory, maiory;
+  QVector<double> y;
+  QVector<double> x;
+  QVector<double> y_temp;
   QString str;
   QByteArray array;
   QStringList list;
@@ -94,7 +101,7 @@ void MainWindow::getData(){
   if(socket->state() == QAbstractSocket::ConnectedState){
     if(socket->isOpen()){
       qDebug() << "reading...";
-      socket->write("get 127.0.0.1\r\n");
+      socket->write (QString("get " + ui->IP_Line->text() + "\r\n").toStdString().c_str());
       socket->waitForBytesWritten();
       socket->waitForReadyRead();
       qDebug() << socket->bytesAvailable();
@@ -102,15 +109,35 @@ void MainWindow::getData(){
         str = socket->readLine().replace("\n","").replace("\r","");
         list = str.split(" ");
         if(list.size() == 2){
-          datetime.fromString(list.at(0),Qt::ISODate);
+          datetime = QDateTime::fromString(list.at(0),Qt::ISODate);
           str = list.at(1);
+          y.append(str.toFloat());
+          y_temp.append(str.toFloat());
+          x.append(datetime.toTime_t());
           qDebug() << datetime << ": " << str;
-          O_bruxo_do_tempo->start();
-          y = list.at(1).toInt();
-          repaint();
+          //qDebug() << y << "\n        " << x;
         }
       }
     }
+    menorx = x.at(0);
+    maiorx = x.at(x.size()-1);
+
+    for(int i = 0; i < x.size(); i++)
+    {
+        x.replace(i, (x.at(i)-menorx)/(maiorx-menorx));
+    }
+
+    qSort(y_temp);
+
+    menory = y_temp.at(0);
+    maiory = y_temp.at(y_temp.size()-1);
+    for(int i = 0; i < y_temp.size(); i++)
+    {
+        y.replace(i,(y.at(i)-menory)/(maiory-menory));
+    }
+    ui->widgetPlotter->DefY(y);
+    ui->widgetPlotter->DefX(x);
+    ui->widgetPlotter->update();
   }
 }
 
@@ -139,7 +166,7 @@ void MainWindow::selecIP(QListWidgetItem* item)
     ui->IP_Line->setText(item->text());
 }
 
-void MainWindow::defcor()
+/*void MainWindow::defcor()
 {
     int r, g, b;
     QColorDialog colordialog;
@@ -149,7 +176,7 @@ void MainWindow::defcor()
     g = colordialog.selectedColor().green();
     b = colordialog.selectedColor().blue();
     ui->widgetPlotter->setFundo(r, g, b);
-}
+}*/
 
 MainWindow::~MainWindow()
 {

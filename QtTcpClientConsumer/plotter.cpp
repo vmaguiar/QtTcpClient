@@ -8,17 +8,20 @@
 
 Plotter::Plotter(QWidget *parent) :
     QWidget(parent)
-   // ui(new Ui::Plotter)
 {
-    //ui->setupUi(this);
-    teta = 0.0;
-    startTimer(10);
-    veloc = 0.0;
-    fundo.setRgb(255,255,0);
-    setMouseTracking(true);
+
+}
+void Plotter::DefX(QVector<double> x)
+{
+    eixoX = x;
 }
 
-void Plotter::timerEvent(QTimerEvent *e){
+void Plotter::DefY(QVector<double> y)
+{
+    eixoY = y;
+}
+
+/*void Plotter::timerEvent(QTimerEvent *e){
   teta = teta + veloc;
   repaint();
 }
@@ -32,36 +35,63 @@ void Plotter::setVelocidade(int _velocidade)
 {
   veloc = _velocidade/100.0;
   repaint();
-}
+}*/
 
 void Plotter::paintEvent(QPaintEvent *e)
 {
-    int x1, y1, x2, y2;
     QPainter pintor(this);
-    pintor.setRenderHint(QPainter::Antialiasing);
-    QPen caneta;
     QBrush pincel;
-    caneta.setColor(QColor(0,0,0));
-    caneta.setWidth(3);
+    QPen caneta;
+    int x1, x2, y1, y2;
+
+    pintor.setRenderHint(QPainter::Antialiasing);
+
+    caneta.setColor(QColor(0,0,35));
     pintor.setPen(caneta);
+
+    pincel.setColor(QColor(255,200,200));
     pincel.setStyle(Qt::SolidPattern);
-    pincel.setColor(QColor(0,0,0));
     pintor.setBrush(pincel);
 
-    x1 = 0;
-    y1= y*height();
+    pintor.drawRect(0,0,width()-1, height()-1);
+
+
+    caneta.setColor(QColor(0,0,35));
+
+    caneta.setWidth(3);
+    pintor.setPen(caneta);
+    if(eixoX.size() > 0)
+    {
+        x1= eixoX.at(0);
+        y1= eixoY.at(0);
+        for(int i = 1; i < eixoX.size(); i++)
+        {
+            x2 = qRound(eixoX.at(i)*width());
+            y2 = height() - qRound(eixoY.at(i)*height());
+            pintor.drawLine(x1,y1,x2,y2);
+            x1 = x2;
+            y2 = y2;
+        }
+    }
+}
+
+/*void Plotter::drawgraf(double y1)
+{
+    int x1, x2;
+    double y2;
+    x1=0;
+    y1 = y1*height();
     for(int i=1; i<width(); i++)
     {
     x2=i;
-    y2= y*height();
-    pintor.drawLine(x1,y1,x2,y1);
+    y2= y1*height();
     x1 = x2;
     y1 = y2;
     }
+    repaint();
+}*/
 
-}
-
-Plotter::~Plotter()
+/*Plotter::~Plotter()
 {
     delete ui;
-}
+}*/

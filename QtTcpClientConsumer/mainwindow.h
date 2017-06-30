@@ -8,6 +8,8 @@
 #include <QWidget>
 #include <QColor>
 #include <QListWidget>
+#include <QString>
+#include <vector>
 #include "plotter.h"
 
 namespace Ui {
